@@ -11,7 +11,8 @@ The repository contains:
 3. the control interface for several robotic platform (common/control-interface)
 4. the user experiments run in the context of the paper (user/)
 5. a snapshot of the Shark Machine Learning Library (version 2.3.0) patched to
-   support multi-objective maximisation
+   support multi-objective maximisation - the latest library version is available
+   at http://image.diku.dk/shark/sphinx_pages/build/html/index.html
 
 The software compiles with gcc/g++ version 4.4, and has not been tested/updated
 for later versions. The software has been tested on a Ubuntu distribution 
