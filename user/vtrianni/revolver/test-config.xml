@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<revolver-configuration>
+<evolution
+  type = "test-evolution"
+  max_generation = "100"
+  evolution_basefile = "revolver_gen"
+  fitness_basefile = "fitness.log"
+  bestind_basefile = "bestind_gen"
+  maximisation = "true" 
+  >
+
+  <population
+    type = "mulambda"
+    size = "100"
+    lambda="20"
+    mutation_probability = "0.05"
+    crossover_probability = "0"
+    elite_size = "4">
+
+    <genotype
+      type = "bitstring"
+      bitpervalue = "8"
+      length = "160"
+      max_value = "1"
+      min_value = "0"
+      />
+
+  </population>
+</evolution>
+</revolver-configuration>

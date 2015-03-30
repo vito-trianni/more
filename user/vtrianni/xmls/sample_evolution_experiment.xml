@@ -1,0 +1,127 @@
+<ahss-config>
+
+  <!-- ****************************** -->
+  <!-- Experiment-specific parameters -->
+  <!-- ****************************** -->
+  <framework>
+
+    <!-- How long a clock tick lasts (in milliseconds) -->
+    <clocktick>100</clocktick>
+
+    <!-- Maximum simulation clock ticks -->
+    <maxclock>10</maxclock>
+
+    <!-- Colon separated list of directories where controllers libraries are compiled -->
+    <controller_path>/home/vtrianni/Work/ahss/user/vtrianni/simulation_build/controllers/sample_sbot_controller/.libs</controller_path>
+
+  </framework>
+
+
+
+  <!-- ****************************** -->
+  <!-- Controller-specific parameters -->
+  <!-- ****************************** -->
+  <controllers>
+    
+    <!-- The tag name is the wanted id of the controller. Attribute 'library' is the name of the compiled library of the controller (be sure to pass the right controller path in the <framework> section) -->
+    <sample_sbot_controller id="sfc" library="sample_sbot_controller">
+
+      <!-- Actuators used by this controller, implicitly initialised by the framework -->
+      <actuators>
+	<!-- Wheels actuator for a sbot -->
+	<sbot_turret>
+	  <implementation>dummy_sbot_turret</implementation>
+	</sbot_turret>
+      </actuators>
+
+      <!-- Sensors used by this controller, implicitly initialised by the framework -->
+      <sensors>
+	<!-- Proximity sensors for a sbot -->
+	<sbot_turret_rotation>
+          <noise>0.1</noise>
+	  <implementation>generic_sbot_turret_rotation</implementation>
+	</sbot_turret_rotation>
+
+      </sensors>
+
+      <!-- Custom settings defined by the user, passed to the Init() method of the controller -->
+      <parameters>
+	<useless_param>sbot BEHAVIOUR BASED CONTROLLER</useless_param>
+      </parameters>
+
+    </sample_sbot_controller>
+  </controllers>
+
+
+
+  <!-- ******************* -->
+  <!-- Arena configuration -->
+  <!-- ******************* -->
+  <!-- The arena is a cube whose width, height and depth are expressed in attribute "size": x,y,z (in meters) // you have to choose between 2D and 3D optimization.-->
+  <arena size="10, 10, 3" optimization="2D" >
+
+    <!-- A block -->
+    <block id="b1">
+      <!-- Coordinates in the Swarmanoid Space: x, y, z (in meters) -->
+      <position>0.6, 0, 0</position>
+      <!-- Rotation in the Swarmanoid Space: Euler Angles (in degrees) -->
+      <orientation>0, 0, 0</orientation>
+      <!-- Size in the Swarmanoid Space: x, y , z (lengths in the three axes in meters) -->
+      <size>1, 1, .5</size>
+    </block>
+
+    <!-- A sbot -->
+    <sbot id="fb1">
+      <!-- Coordinates in the Swarmanoid Space: x, y, z (in meters) -->
+      <position>0, 0, 0</position>
+      <!-- Orientation in the Swarmanoid Space: Euler Angles (in degrees) -->
+      <orientation>0, 0, 0</orientation>
+      <controller>sfc</controller>
+    </sbot>
+
+  </arena>
+
+
+
+  <!-- **************************************************************** -->
+  <!-- Describe the physics engines that dictate movement and collision -->
+  <!-- **************************************************************** -->
+  <engines>
+
+    <!-- A simple 2D physics engine without collisions. -->
+    <dummy_engine id="ground">
+      <!-- How many times this physics engine should be called for each simulation clock tick. -->
+      <subclock>1</subclock>
+      <!-- The axis the plane of this engine is perpendicular to -->
+      <perpendicular_axis>z</perpendicular_axis>
+      <!-- The distance to the chosen axis in Swarmanoid Space -->
+      <distance>0</distance>
+    </dummy_engine>
+
+  </engines>
+  
+  <!-- ******************************************** -->
+  <!-- Mapping between physics engines and entities -->
+  <!-- ******************************************** -->
+  <arena_physics>
+
+    <!-- The ground physics engine contains the two sbots -->
+    <engine id="ground">
+      <entity id="b1" />
+      <entity id="fb1" />
+    </engine>
+
+  </arena_physics>
+
+
+
+  <!-- ********************************* -->
+  <!-- Visualisation-specific parameters -->
+  <!-- ********************************* -->
+  <visualisations>
+
+<!--    <ogre_render id="3d_world" />-->
+
+  </visualisations>
+
+</ahss-config>

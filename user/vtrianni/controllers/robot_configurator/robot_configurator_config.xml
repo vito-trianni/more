@@ -1,0 +1,72 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="2" />
+    <experiment length="100" ticks_per_second="10" />
+  </framework>
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+    
+    <robot_configurator id="nn" library="$ARGOSINSTALLDIR/build/user/vtrianni/simulator/controllers/robot_configurator/librobot_configurator.so">
+
+      <actuators>
+        <footbot_wheels                 implementation="default" />
+        <footbot_leds                   implementation="default" />
+        <footbot_base_leds              implementation="default" />
+        <footbot_turret                 implementation="default" />
+      </actuators>
+
+      <sensors>
+        <footbot_base_ground            implementation="rot_z_only"/>
+      </sensors>
+
+      <parameters configuration_file="configuration.xml"
+                num_samples="20" />
+
+    </robot_configurator>
+  </controllers>
+
+
+
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <!-- Note: rotations are specified and performed in ZYX order (opposite of ARGoS1) -->
+  <arena size="2, 2, 3">
+    <foot-bot id="fb0" position="0,0,0" orientation="0,0,0" controller="nn" /> 
+    <floor id="floor" source="loop_functions" pixels_per_meter="100" />
+  </arena>
+
+
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <kinematics2d id="dyn2d" />
+  </physics_engines>
+
+  <!-- ************************************ -->
+  <!-- * Arena -> Physics Engines mapping * -->
+  <!-- ************************************ -->
+  <arena_physics>
+    <engine id="dyn2d">
+      <entity id="fb[[:digit:]]*" />
+    </engine>
+  </arena_physics>
+
+
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <visualization>
+  </visualization>
+
+</argos-configuration>

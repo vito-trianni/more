@@ -1,0 +1,114 @@
+<ahss-config>
+	
+	<!-- ****************************** -->
+	<!-- Experiment-specific parameters -->
+	<!-- ****************************** -->
+	<framework>
+		<clocktick>100</clocktick>
+		<maxclock>1000000</maxclock>
+		<controller_path>$AHSSINSTALLDIR/user/vtrianni/simulation_build/controllers/test_ground_controller/.libs</controller_path>
+		<random_seed>328021</random_seed>
+	</framework>
+	
+
+	<!-- ****************************** -->
+	<!-- loop functions                 -->
+	<!-- ****************************** -->	
+        <loop_functions>
+		<library_path>$AHSSINSTALLDIR/user/vtrianni/simulation_build/loop_functions/test_loop_functions/.libs/</library_path>
+	        <library_name>test_loop_functions</library_name>
+        </loop_functions>
+
+
+	<!-- ****************************** -->
+	<!-- Controller-specific parameters -->
+	<!-- ****************************** -->
+	<controllers>
+		
+		<test_ground_controller id="tgc" library="test_ground_controller">
+				
+			<actuators>
+				<sbot_wheels>
+					<implementation>dummy_sbot_wheels</implementation>
+				</sbot_wheels>
+			</actuators>
+				
+			<sensors>
+				<sbot_ground>
+					<implementation>generic_sbot_ground</implementation>
+				</sbot_ground>
+			</sensors>
+		</test_ground_controller>
+	</controllers>
+
+
+	<!-- ******************* -->
+	<!-- Arena configuration -->
+	<!-- ******************* -->
+	<arena size="10, 10, 3" optimization="3D" >
+		<plane id="grnd">
+			<position>0, 0, 0</position>
+			<size>4, 4</size>
+<!--
+			<color type="image">
+				<load_from>ground-write.ppm</load_from>
+				<directory>$AHSSINSTALLDIR/user/vtrianni/images/</directory>
+			</color>
+-->
+			<color type="function">
+				<save_to>grnd.ppm</save_to>
+				<directory>$AHSSINSTALLDIR/user/vtrianni/</directory>
+			</color>
+		</plane>
+
+
+		<!-- A sbot -->
+		<sbot id="fb1">
+			<position>0, -1, 0</position>
+			<orientation>0, 0, 45</orientation>
+			<controller>tgc</controller>
+		</sbot>
+	</arena>
+
+	<!-- **************************************************************** -->
+	<!-- Describe the physics engines that dictate movement and collision -->
+	<!-- **************************************************************** -->
+	<engines>
+		<dummy_engine id="ground">
+			<subclock>1</subclock>
+			<perpendicular_axis>z</perpendicular_axis>
+			<distance>0</distance>
+		</dummy_engine>
+	</engines>
+
+				
+	<!-- ******************************************** -->
+	<!-- Mapping between physics engines and entities -->
+	<!-- ******************************************** -->
+	<arena_physics>
+		<!-- The ground physics engine contains the two sbots -->
+		<engine id="ground">
+			<entity id="fb1" />
+		</engine>
+	</arena_physics>
+
+	<!-- ********************************* -->
+	<!-- Visualisation-specific parameters -->
+	<!-- ********************************* -->
+	<visualisations>
+		<opengl_render id="mainwindow">
+			<window_size>1024, 768</window_size>
+			<window_title>Prey Gripping Experiment</window_title>
+			<camera_view_XYZ_0>0, 0, 2</camera_view_XYZ_0>
+			<camera_view_HPR_0>90, -90, 0</camera_view_HPR_0>
+			<use_textures>true</use_textures>
+			<use_shadows>false</use_shadows>
+			<start_paused>true</start_paused>
+			<write_frames>false</write_frames>
+			<frame_directory>movies/prey_gripping</frame_directory>
+			<frame_filename>frame_</frame_filename>
+		</opengl_render >
+
+	</visualisations>
+				
+</ahss-config>

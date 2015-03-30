@@ -1,0 +1,109 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="0" />
+    <experiment length="600" ticks_per_second="10" />
+  </framework>
+
+  <!-- ****************** -->
+  <!-- * Loop functions * -->
+  <!-- ****************** -->
+  <loop_functions 
+     library="$ARGOSINSTALLDIR/build/user/vtrianni/simulator/experiments/stick_pulling/libstick_pulling.so" 
+     label="stick_pulling_lf" 
+     max_init_trials = "100"
+     num_robots = "6"
+     min_init_distance = "1.5"
+     num_arena_walls = "24"
+     max_robot_speed = "20"
+     num_sticks = "18"
+     stick_pulling_radius = "0.25"
+     min_pulling_robots = "3">
+  </loop_functions>
+
+
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+    
+    <stick_pulling_controller id="nn" library="$ARGOSINSTALLDIR/build/user/vtrianni/simulator/experiments/stick_pulling/libstick_pulling.so">
+
+
+
+      <actuators>
+        <footbot_wheels                 implementation="default"  noise_std_dev="0.05" />
+        <footbot_beacon implementation="default" />
+      </actuators>
+
+      <sensors>
+        <footbot_proximity implementation="rot_z_only"  noise_level="0.05" show_rays="false" />
+        <footbot_omnidirectional_camera implementation="rot_z_only" 
+                                      blob_noise_std_dev="0.05"
+                                      check_occlusions="false"
+                                      show_rays="false" />
+
+      </sensors>
+
+      <parameters parameter_file="user/vtrianni/experiments/stick_pulling/bestind.log`"
+                num_inputs="18"
+                num_outputs="3"
+                inputs_for_vector="6"
+                inputs_for_vector_offset="0.5"
+                speed_range="-20:20"
+                camera_range="0:100"
+                saturation_ir="2"
+                saturation_red="5"
+                saturation_blue="5"/>
+    </stick_pulling_controller>
+
+
+  </controllers>
+
+
+
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <!-- Note: rotations are specified and performed in ZYX order (opposite of ARGoS1) -->
+  <arena size="12,12,3">
+    <!-- floor id="floor" source="loop_functions" pixels_per_meter="100" / -->
+  </arena>
+
+
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <kinematics2d id="ground" />
+  </physics_engines>
+
+  <!-- ************************************ -->
+  <!-- * Arena -> Physics Engines mapping * -->
+  <!-- ************************************ -->
+  <arena_physics>
+    <engine id="ground">
+    </engine>
+  </arena_physics>
+
+
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <visualization>
+    <qtopengl_render splash="false"> 
+      <camera>
+        <placement idx="0" position="0,0.01,8.5" look_at="0,0,0" />
+        <placement idx="1" position="2,0,2" look_at="0,0,0" />
+      </camera>
+      <!-- user_functions library="$ARGOSINSTALLDIR/build/user/vtrianni/simulator/experiments/stick_pulling/libstick_pulling.so" label="stick_pulling_qt" / -->
+    </qtopengl_render>
+  </visualization>
+
+</argos-configuration>

@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<morevolver-configuration>
+<evolution
+  type = "mulambda-evolution"
+  max_generation = "200"
+  save_generation_step = "1"
+  num_generation = "199"
+  maximisation = "true"
+  evolution_basefile = "revolver"
+  fitness_basefile = "postevalfit"
+  bestind_basefile = "posteval"
+  num_samples = "500"
+  num_processes = "20"
+  experiment = "user/vtrianni/experiments/flocking/flocking_evoconfig.xml"
+  population_size = "100"
+  population_size_mu = "100"
+  elite_size = "25"
+  genotype_size = "38"
+  gene_min_value = "-5"
+  gene_max_value = "5"
+  mutation_variance = "1"
+  num_objectives = "2"
+  posteval_type = "posteval_so"
+/>
+</morevolver-configuration>

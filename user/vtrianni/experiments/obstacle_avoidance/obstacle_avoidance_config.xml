@@ -1,0 +1,236 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="2" />
+    <experiment length="120" ticks_per_second="10"/>
+  </framework>
+
+  <!-- ****************** -->
+  <!-- * Loop functions * -->
+  <!-- ****************** -->
+  <loop_functions 
+     library="$ARGOSINSTALLDIR/build/user/vtrianni/simulator/experiments/obstacle_avoidance/libobstacle_avoidance.so" 
+     label="obstacle_avoidance_lf" 
+     fitness_type = "multi_objective"
+     fitness_weight = "1"
+     init_radius = "0.04"
+     max_speed = "10">
+  <starting_points>
+    <segment start="-0.25,-0.25" end="1.15,-0.25" />
+    <segment start="1.15,-0.25" end="0.95,0.25" />
+    <segment start="0.95,0.25" end="0.25,0.25" />
+    <segment start="0.25,0.25" end="0.25,1.25" />
+    <segment start="0.25,1.25" end="-0.95,1.25" />
+    <segment start="-0.95,1.25" end="-1.15,0.75" />
+    <segment start="-1.15,0.75" end="-0.25,0.75" />
+    <segment start="-0.25,0.75" end="-0.25,-0.25" />
+  </starting_points>
+  </loop_functions>
+
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+    
+    <obstacle_avoidance_controller id="nn" library="$ARGOSINSTALLDIR/build/user/vtrianni/simulator/experiments/obstacle_avoidance/libobstacle_avoidance.so">
+      <actuators>
+        <footbot_wheels implementation="default" noise_std_dev="0.05" />
+      </actuators>
+
+      <sensors>
+        <footbot_proximity implementation="rot_z_only"  noise_level="0.05" show_rays="true" />
+      </sensors>
+
+      <parameters parameter_file="__BESTIND"
+                num_inputs="24"
+                num_outputs="2"
+                input_type="raw"
+                speed_range="-10:10" />
+
+    </obstacle_avoidance_controller>
+  </controllers>
+
+
+
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <!-- Note: rotations are specified and performed in ZYX order (opposite of ARGoS1) -->
+  <arena size="8, 8, 3">
+    <box id="W1"
+         position="0.4,0,0.05"
+         orientation="0,0,0"
+         size="0.8,0.2,0.1"
+         movable="false" />
+    <box id="W2"
+         position="0,0.5,0.05"
+         orientation="90,0,0"
+         size="1.0,0.2,0.1"
+         movable="false" />
+    <box id="W3"
+         position="0.55,-0.5,0.05"
+         orientation="0,0,0"
+         size="2.1,0.2,0.1"
+         movable="false" />
+
+    <box id="W41"
+         position="-0.5,0,0.05"
+         orientation="90,0,0"
+         size="1.0,0.2,0.1"
+         movable="false" />
+    <box id="W42"
+         position="-1.05,0.5,0.05"
+         orientation="0,0,0"
+         size="1.1,0.2,0.1"
+         movable="false" />
+    <box id="W43"
+         position="-1.35,1.0,0.05"
+         orientation="63.435,0,0"
+         size="1.118,0.2,0.1"
+         movable="false" />
+    <box id="W44"
+         position="-0.4,1.0,0.05"
+         orientation="0,0,0"
+         size="0.8,0.2,0.1"
+         movable="false" />
+
+    <box id="W5"
+         position="-0.3,1.5,0.05"
+         orientation="0,0,0"
+         size="1.6,0.2,0.1"
+         movable="false" />
+    <box id="W6"
+         position="0.5,1,0.05"
+         orientation="90,0,0"
+         size="1.0,0.2,0.1"
+         movable="false" />
+    <box id="W7"
+         position="0.8,0.5,0.05"
+         orientation="0,0,0"
+         size="0.6,0.2,0.1"
+         movable="false" />
+    <box id="W8"
+         position="1.35,0,0.05"
+         orientation="-63.435,0,0"
+         size="1.118,0.2,0.1"
+         movable="false" />
+
+
+
+    <cylinder id="C0"
+         position="0,0,0.05"
+         orientation="0,0,0"
+         radius="0.1"
+         height="0.1"
+         movable="false" />
+    <cylinder id="C1"
+         position="0,1,0.05"
+         orientation="0,0,0"
+         radius="0.1"
+         height="0.1"
+         movable="false" />
+    <cylinder id="C2"
+         position="0.8,0,0.05"
+         orientation="0,0,0"
+         radius="0.1"
+         height="0.1"
+         movable="false" />
+    <cylinder id="C3"
+         position="-0.5,-0.5,0.05"
+         orientation="0,0,0"
+         radius="0.1"
+         height="0.1"
+         movable="false" />
+
+
+    <cylinder id="C41"
+         position="-0.5,0.5,0.05"
+         orientation="0,0,0"
+         radius="0.1"
+         height="0.1"
+         movable="false" />
+    <cylinder id="C42"
+         position="-1.6,0.5,0.05"
+         orientation="0,0,0"
+         radius="0.1"
+         height="0.1"
+         movable="false" />
+    <cylinder id="C43"
+         position="-1.1,1.5,0.05"
+         orientation="0,0,0"
+         radius="0.1"
+         height="0.1"
+         movable="false" />
+    <cylinder id="C44"
+         position="-0.8,1.0,0.05"
+         orientation="0,0,0"
+         radius="0.1"
+         height="0.1"
+         movable="false" />
+
+    <cylinder id="C5"
+         position="0.5,1.5,0.05"
+         orientation="0,0,0"
+         radius="0.1"
+         height="0.1"
+         movable="false" />
+    <cylinder id="C6"
+         position="0.5,0.5,0.05"
+         orientation="0,0,0"
+         radius="0.1"
+         height="0.1"
+         movable="false" />
+    <cylinder id="C7"
+         position="1.1,0.5,0.05"
+         orientation="0,0,0"
+         radius="0.1"
+         height="0.1"
+         movable="false" />
+    <cylinder id="C8"
+         position="1.6,-0.5,0.05"
+         orientation="0,0,0"
+         radius="0.1"
+         height="0.1"
+         movable="false" />
+
+    <!-- floor id="floor" source="loop_functions" pixels_per_meter="100" / -->
+  </arena>
+
+
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <kinematics2d id="dyn2d" iterations="10" />
+  </physics_engines>
+
+  <!-- ************************************ -->
+  <!-- * Arena -> Physics Engines mapping * -->
+  <!-- ************************************ -->
+  <arena_physics>
+    <engine id="dyn2d">
+      <entity id="W[[:digit:]]*" />
+      <entity id="C[[:digit:]]*" />
+    </engine>
+  </arena_physics>
+
+
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <visualization>
+    <qtopengl_render splash="false"> 
+      <camera>
+        <placement idx="0" position="0.5,0,4.5" look_at="0.5,0,0" />
+        <placement idx="1" position="1,1,2" look_at="0,0,0" />
+      </camera>
+    </qtopengl_render>
+  </visualization>
+
+</argos-configuration>

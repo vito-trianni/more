@@ -1,0 +1,3 @@
+#add_definitions(-Wall -Werror -DCMAKE_BUILD_TYPE=Debug -DARGOS_DBG_CONTROLLER)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
+

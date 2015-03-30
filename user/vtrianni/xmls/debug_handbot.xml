@@ -1,0 +1,229 @@
+<ahss-config>
+
+  <!-- ********* -->
+  <!-- Framework -->
+  <!-- ********* -->
+  <framework>
+
+    <clocktick>1</clocktick>
+    <maxclock>0</maxclock>
+    <controller_path>/home/vtrianni/Work/ahss/user/vtrianni/simulation_build/controllers/sample_footbot_controller/.libs/:/home/vtrianni/Work/ahss/user/vtrianni/simulation_build/controllers/debug_handbot_controller/.libs/:/home/vtrianni/Work/ahss/user/vtrianni/simulation_build/controllers/sample_handbot_controller/.libs/</controller_path>
+    <random_seed>328021</random_seed>
+
+  </framework>
+
+
+
+  <!-- *********** -->
+  <!-- Controllers -->
+  <!-- *********** -->
+  <controllers>
+    
+    <debug_handbot_controller id="test" library="debug_handbot_controller">
+	    <actuators>
+		    <handbot_rope>
+			    <implementation>3d_dynamics_handbot_rope</implementation>
+		    </handbot_rope>
+		    <handbot_launcher>
+			    <implementation>3d_dynamics_handbot_launcher</implementation>
+		    </handbot_launcher>		    
+		    <handbot_arms_actuator>
+			    <implementation>3d_dynamics_handbot_arms</implementation>
+		    </handbot_arms_actuator>
+		    <handbot_fingers_actuator>
+			    <implementation>3d_dynamics_handbot_fingers</implementation>
+		    </handbot_fingers_actuator>		     
+		    <handbot_hands_actuator>
+			    <implementation>3d_dynamics_handbot_hands</implementation>
+		    </handbot_hands_actuator>		     		    
+		    <handbot_head_actuator>
+			    <implementation>3d_dynamics_handbot_head</implementation>
+		    </handbot_head_actuator>		
+		    <handbot_fans>
+			    <implementation>3d_dynamics_handbot_fans</implementation>
+		    </handbot_fans>			   
+	     </actuators>	    
+	     <sensors>
+	     </sensors>
+    </debug_handbot_controller>
+    
+  </controllers>
+
+
+
+  <!-- ***** -->
+  <!-- Arena -->
+  <!-- ***** -->
+  
+  <arena size="4, 4, 2" optimization="2D" >  
+
+<!--    <block id="column1">
+      <position>1.2, 1.2, 0.95</position>
+      <orientation>0, 0, 0</orientation>
+      <size>0.1, 0.1, 1.9</size>
+    </block>
+
+    <block id="column2">
+      <position>2.8, 1.2, 0.95</position>
+      <orientation>0, 0, 0</orientation>
+      <size>0.1, 0.1, 1.9</size>
+    </block>
+
+    <block id="column3">
+      <position>1.2, 2.8, 0.95</position>
+      <orientation>0, 0, 0</orientation>
+      <size>0.1, 0.1, 1.9</size>
+    </block>
+
+    <block id="column4">
+      <position>2.8, 2.8, 0.95</position>
+      <orientation>0, 0, 0</orientation>
+      <size>0.1, 0.1, 1.9</size>
+    </block>
+    
+    <block id="ceiling">
+      <position>2, 2, 1.95</position>
+      <orientation>0, 0, 0</orientation>
+      <size>2, 2, 0.1</size>
+    </block>-->
+    
+    <plane id="plane">
+	    <!-- Coordinates in the Swarmanoid Space: x, y, z (in meters) -->
+	    <position>0, 0, 0</position>
+	    <!-- Rotation in the Swarmanoid Space: Euler Angles (in degrees) -->
+	    <orientation>0, 0, 0</orientation>
+    </plane>
+    
+    <handbot id="hb1">
+	    <!-- pos to test the rope, under the table -->
+<!--  	     <position>1.7, 1.7, 0.225</position>    -->
+	     
+<!--  	     <position>0.0, 0.0, 0.225</position>   	     -->
+	    
+	    <!-- pos to test the head, should change size of the body to 3.45 -->
+ 	     <position>0, 0, 0.225</position>  
+
+	    <orientation>0, 0, 0</orientation>
+	    <controller>test</controller>
+    </handbot>
+    
+
+	
+    
+  </arena>
+
+
+
+  <!-- ******* -->
+  <!-- Engines -->
+  <!-- ******* -->
+  <engines>
+
+
+    <dynamics3d_engine id="ground">
+	<!-- How many times this physics engine should be called for each simulation clock tick. -->
+	<subclock>1</subclock>
+	<gravity>0,0,-9.81</gravity>
+<!-- 	<accuracy>true</accuracy> -->
+	<erp>0.9</erp>
+	<cfm>10e-6</cfm>
+	<!-- contact parameters -->
+	<contacts>
+		<contact id="c1">
+			<material_1>footbot-wheel</material_1>
+			<material_2>wood</material_2>
+			<mode>SoftERP|SoftCFM|Approx1</mode>
+			<mu>1,0</mu>
+			<bounciness>0.3,0</bounciness>
+			<softness>0.5,0.02</softness>
+			<motion>0,0</motion>
+			<slip>0,0</slip>
+		</contact>
+		
+		<contact id="c2">
+			<material_1>default</material_1>
+			<material_2>wood</material_2>
+			<mode>SoftERP|SoftCFM|Approx1</mode>
+			<mu>1,0</mu>
+			<bounciness>0.3,0</bounciness>
+			<softness>0.5,0.02</softness>
+			<motion>0,0</motion>
+			<slip>0,0</slip>
+		</contact>
+		
+		<contact id="c3">
+			<material_1>handbot_material</material_1>
+			<material_2>wood</material_2>
+			<mode>SoftERP|SoftCFM | Motion1 | Motion2 | Slip1 | Slip2 </mode>
+			<mu>-1,-1</mu>
+			<bounciness>0,0</bounciness>
+			<softness>1,0.00</softness>
+			<motion>0,0</motion>
+			<slip>0,0</slip>
+		</contact>
+      
+      </contacts>   
+
+    </dynamics3d_engine>
+
+  </engines>
+  
+  <!-- ************* -->
+  <!-- Arena Physics -->
+  <!-- ************* -->
+  <arena_physics>
+	  
+    <engine id="ground">
+	<entity id="hb1" />
+	<entity id="plane" />
+	
+	<!--      <entity id="column1" />
+	<entity id="column2" />
+	<entity id="column3" />
+	<entity id="column4" />
+      <entity id="ceiling" /> -->
+	
+    </engine>
+  </arena_physics>
+
+
+
+  <!-- ************** -->
+  <!-- Visualisations -->
+  <!-- ************** -->
+  <visualisations>
+
+    <!--<text_render id="text_world">
+       <file>experiment_output.txt</file>
+       <precision>2</precision>
+     </text_render>-->
+    
+   <opengl_render id="mainwindow">
+      <window_size>1024, 768</window_size>
+      <window_title>Prey Gripping Experiment</window_title>
+	 <camera_view_XYZ_0>-0.136622, 5.45426, 2.56</camera_view_XYZ_0>
+	<camera_view_HPR_0>-89.5, -23.5, 0</camera_view_HPR_0>
+	<camera_view_XYZ_1>0.0918456, 2.19075, 2</camera_view_XYZ_1>
+	<camera_view_HPR_1>-89, -12.5, 0</camera_view_HPR_1>
+	<camera_view_XYZ_2>0.0510555, 0.967172, 2.19</camera_view_XYZ_2>
+	<camera_view_HPR_2>-88.5, -70.5, 0</camera_view_HPR_2>
+	<camera_view_XYZ_3>1.44489, 0.329717, 0.9</camera_view_XYZ_3>
+	<camera_view_HPR_3>171, -14.5, 0</camera_view_HPR_3>
+	<camera_view_XYZ_4>1.69565, 0.35935, 1.15</camera_view_XYZ_4>
+	<camera_view_HPR_4>-177, 3, 0</camera_view_HPR_4>
+
+
+	<camera_view_XYZ_9>1.97288, -2.5198, 2.73</camera_view_XYZ_9>
+	<camera_view_HPR_9>89.5, -20, 0</camera_view_HPR_9>
+      <use_textures>false</use_textures>
+      <write_frames>false</write_frames>
+      <frame_directory>frames</frame_directory>
+      <frame_filename>frame_</frame_filename>
+	<start_paused>true</start_paused>
+    </opengl_render >
+
+    
+  </visualisations>
+
+</ahss-config>
+

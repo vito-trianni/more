@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<revolver-configuration>
+<evolution
+  type = "parallel-evolution"
+  max_generation = "200"
+  evolution_basefile = "revolver"
+  fitness_basefile = "fitness"
+  bestind_basefile = "bestind"
+  maximisation = "true"
+  num_samples = "10"
+  num_processes = "10"
+  parallel_environment = "mpi"
+  experiment = "user/vtrianni/experiments/obstacle_avoidance/obstacle_avoidance_evoconfig.xml"
+  >
+
+  <population
+    type = "mulambda"
+    size = "100"
+    lambda="20"
+    mutation_probability = "0.04"
+    crossover_probability = "0"
+    elite_size = "20">
+
+    <genotype
+      type = "bitstring"
+      bitpervalue = "8"
+      length = "48"
+      max_value = "5"
+      min_value = "-5"
+      />
+
+  </population>
+</evolution>
+</revolver-configuration>

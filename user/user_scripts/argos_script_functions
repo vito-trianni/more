@@ -1,0 +1,440 @@
+#!/bin/sh
+#
+# This file hold common bash script functions for the ARGOS simulator.
+# Assumed bash version is 3.0.
+#
+# NOTES on editing this file:
+#  - please don't fuck with this file
+#  - please make sure that your stuff is 1) tested, 2) works, and 3) documented
+#  - please don't fuck with this file
+#
+# Authors:
+#   Arne Brutschy <arne.brutschy@ulb.ac.be>
+#
+###############################################################################
+# Usage: add the following lines (without the comments) to your script
+#
+# check if we got a basedir
+#if [ "${ARGOSINSTALLDIR}" == "" ]; then
+#  echo "Error: You need to set the ARGOSINSTALLDIR environment variable!" 1>&2
+#  exit 1
+#fi
+#if [ ! -e ${ARGOSINSTALLDIR}/user/user_scripts/argos_script_functions ]; then
+#  echo "Error: Your ARGOSINSTALLDIR environment variable is not set properly!" 1>&2
+#  exit 1
+#fi
+#
+## source the common script functions
+#source ${ARGOSINSTALLDIR}/user/user_scripts/argos_script_functions
+#
+## do some basic checks
+#default_checks
+#default_user_checks
+#
+###############################################################################
+# Internal configuration of the build scripts.
+# NOTE: if you change stuff here, you should know what you'r doing.
+
+# number of robots currently configured
+# NOTE: if you configure more than 10, you have to rewrite stuff like
+#       robot_type_menu() as it works with values 0-9 only!!!
+NUM_ROBOTS=5
+
+# name of robot types
+ROBOT_TYPES=("sbot" "swarmanoid" "rbot" "epuck" "antalbot")
+
+# binary vector, 0=real robot exists/will be there, 1=simulation only robot
+ROBOT_SIMONLY=(0 0 1 0 1)
+
+# binary vector, 0=real robot is not yet available, 1=real robot is available
+# available means: the real robot is there and we've got a toolchain
+ROBOT_AVAIL=(0 1 0 1 0)
+
+# variable names of robot, usually just ROBOT_TYPE in uppercase
+# use NONE for simulation only robots
+ROBOT_VARS=("SBOT" "SWARMANOID" "NONE" "EPUCK" "NONE")
+
+# uncomment this line if you want to have debug output
+#DEBUG=1
+
+
+
+###############################################################################
+# Checks if the current dir lives under the ARGOSINSTALLDIR.
+# if not, we might have a wrong ARGOSINSTALLDIR and need to warn the user.
+# RETURN: 0 if not, 1 if everything is fine
+#
+function check_currentdir() {
+    PATTERN=`echo $ARGOSINSTALLDIR | sed 's/^\(.*\)\/$/\1/' | sed 's/\//\\//g' | sed 's/^\(.*\)$/^\1.*$/'`
+    if [[ `pwd` =~ ${PATTERN} ]]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+###############################################################################
+# Checks if the userdir is configured.
+# If the link is there, create a global variable called ARGOSUSERDIR.
+# RETURN: 0 if not, 1 if everything is fine
+#
+function check_userdir() {
+    if [ -e ${ARGOSINSTALLDIR}/user/my_user ]; then
+        ARGOSUSERDIR=${ARGOSINSTALLDIR}/user/`readlink ${ARGOSINSTALLDIR}/user/my_user`
+        ARGOSUSERNAME=`readlink $ARGOSINSTALLDIR/user/my_user`
+        return 1
+    else
+        return 0
+    fi
+}
+
+###############################################################################
+# Checks for the build configuration file.
+# Requires the user's dir link to be there.
+# RETURN: 0 if not, 1 if everything is fine
+#
+function check_build_config() {
+    if [ -e ${ARGOSINSTALLDIR}/user/my_user/build.conf ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+###############################################################################
+# Checks for bash version 3.
+# RETURN: 0 if not, 1 if everything is fine
+#
+function check_bash_version() {
+    if [ "${BASH_VERSINFO}" == "3" -o "${BASH_VERSINFO}" == "4" ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+###############################################################################
+# Does some default checks on the environment.
+# If a check fails, the function displays a short message and calls 'exit 1'.
+# Currently checks for: currentdir, bash_version
+#
+function default_checks() {
+    check_currentdir 1>&2
+    if [ $? == 0 ]; then
+        echo "Error: Your current directory does not live in your \$ARGOSINSTALLDIR!" 1>&2
+        echo 1>&2
+        echo "You have to set your \$ARGOSINSTALLDIR properly. Currently, this script" 1>&2
+        echo "does not live in your specified \$ARGOSINSTALLDIR, thus possibly creating" 1>&2
+        echo "a version clash of working copies." 1>&2
+        exit 1
+    fi
+
+    check_bash_version
+    if [ $? == 0 ]; then
+        echo "Error: You do not seem to have bash version >= 3." 1>&2
+        echo 1>&2
+        echo "The build scripts have been written for bash version >= 3. If you're not" 1>&2
+        echo "using that shell, please change/update your system." 1>&2
+        exit 1
+    fi
+}
+
+###############################################################################
+# Does some default checks on the user.
+# If a check fails, the function displays a short message and calls 'exit 1'.
+# Currently checks for: userdir, build config
+#
+function default_user_checks() {
+    check_userdir
+    if [ $? == 0 ]; then
+        echo "Error: Your user directory is not properly configured!" 1>&2
+        echo 1>&2
+        echo "You should have a link named 'my_user' in ${ARGOSINSTALLDIR}/user," 1>&2
+        echo "which points to your own user directory. Without that, the" 1>&2
+        echo "build scripts do not know what your username is." 1>&2
+        exit 1
+    fi
+
+#  check_build_config
+#  if [ $? == 0 ]; then
+#    echo "Error: You do not seem to have a build configuration file." 1>&2
+#    echo 1>&2
+#    echo "In order to use the build scripts, you should have a file called 'build.conf'" 1>&2
+#    echo "in your user directory. If you need a default configuration, copy it from" 1>&2
+#    echo "${ARGOSINSTALLDIR}/user/.template/build.conf" 1>&2
+#    exit 1
+#  fi
+}
+
+###############################################################################
+# Create the user/my_user link with first checking if it already exists.
+# PARAM1: username/directory to link to
+#
+function create_user_link() {
+    # check if we got a username
+    if [ "${1}" == "" ]; then
+        echo "Error: No username supplied!" 1>&2
+        echo "NOT creating 'my_user' link." 1>&2
+        return
+    fi
+
+    # check if the my_user link already exists
+    if [ -L ${ARGOSINSTALLDIR}/user/my_user ]; then
+        echo "Error: ${ARGOSINSTALLDIR}/user/my_user already exists." 1>&2
+        echo "NOT creating 'my_user' link." 1>&2
+        return
+    fi
+
+    echo "Creating 'my_user' link..."
+    cd ${ARGOSINSTALLDIR}/user
+    ln -s ${1} my_user
+}
+
+###############################################################################
+# Checks if the user is properly configured (= 'user/my_user' link exists).
+# If not, it asks the user for his username. If the user does not have
+# a username/directory, it gets created by calling the create_user.sh script.
+#
+function check_create_user() {
+    # check if the user is known
+    check_userdir
+
+    # if the user is not known, either create a link or a new user
+    if [ $? == 0 ]; then
+        USERNAME=`whoami`
+        echo "Your user directory does not seem be properly configured."
+        echo
+        read -ep "Do you already have a user (y/n) [y]: " YN
+        if [[ x"$YN" == "xy" || x"$YN" == "x" ]]; then
+            while [ "${ARGOSUSERNAME}" == "" ]; do
+                read -ep "Please enter your username [${USERNAME}]: " ARGOSUSERNAME
+
+                # check if the user wants to use his unxi username
+                if [ "${ARGOSUSERNAME}" == "" ]; then
+                    ARGOSUSERNAME=${USERNAME}
+                fi
+
+                # see if the requested user directory actually exists
+                if [ ! -d ${ARGOSINSTALLDIR}/user/${ARGOSUSERNAME} ]; then
+                    echo "This user does not exist!"
+                    ARGOSUSERNAME=
+                else
+                    break
+                fi
+            done
+
+            # create the actual link
+            create_user_link ${ARGOSUSERNAME}
+        else
+            echo
+            echo "In this framework, all controller development and compilation is"
+            echo "performed in your user directory."
+            echo
+            echo "If this is the first time you are installing the ARGOS simulator, this"
+            echo "script can automatically create your user dir for you. Please note that"
+            echo "your user dir will automatically be added to the svn repository (so don't"
+            echo "use this script to recreate the same directory on two different machines!)"
+            echo
+            read -ep "Do you want to create your user directory with example controllers now (y/n) [n]: " YN
+            if [ x"$YN" == "xy" ]; then      
+                { cd "${ARGOSINSTALLDIR}/user" && ./create_user.sh; } || { exit 1; }
+            fi
+        fi
+    fi
+}
+
+###############################################################################
+# Checks if we're in the users controller directory.
+#
+function check_controller_directory() {
+    # check if we're in the right directory
+    PATTERN="^.*controllers\/?$"
+    if [[ ! `pwd` =~ ${PATTERN} ]]; then
+        echo "Error: You have to call this script from your controller directory." 1>&2
+        exit 1
+    fi
+}
+
+###############################################################################
+# Checks if we're in the users loop_functions directory.
+#
+function check_loop_functions_directory() {
+    # check if we're in the right directory
+    PATTERN="^.*loop_functions\/?$"
+    if [[ ! `pwd` =~ ${PATTERN} ]]; then
+        echo "Error: You have to call this script from your loop function directory." 1>&2
+        exit 1
+    fi
+}
+
+###############################################################################
+# Replace the content between to tags in a file with the content of another file.
+# PARAM1: start of tags, in file must be like '# XXXX_START' and '# XXXX_END'
+# PARAM2: file holding content which should be inserted
+# PARAM3: target file
+#
+function replace_between_infile() {
+    TAGNAME=$1
+    CONTENT=$2
+    INTO=$3
+    sed -i "/^# ${TAGNAME}_START$/,/^# ${TAGNAME}_END$/{/^# ${TAGNAME}_.*$/! d;}" ${INTO}
+    sed -i "/^# ${TAGNAME}_START$/r ${CONTENT}" ${INTO}
+}
+
+###############################################################################
+# Displays a menu of all possible robots to the user.
+# The selected robot type will be put in the gobal variable REQ_ROBOT_TYPE.
+# PARAM1: 1 if only the available robots should be displayed, 0 otherwise
+#
+function get_robot_type() {
+    AVAILABLE=$1
+
+    # display menu
+    echo "List of possible real robot platforms:"
+    echo
+    PATTERN='^['
+
+    for I in `seq 0 $((${NUM_ROBOTS}-1))`; do
+        if [[ ${AVAILABLE} == 0 || ${ROBOT_AVAIL[$I]} == 1 ]]; then
+            echo "   $I) ${ROBOT_TYPES[$I]}"
+            PATTERN="${PATTERN}${I}"
+        fi
+    done
+    echo
+    PATTERN="${PATTERN}]\$"
+
+    # read user's input
+    while [[ ! ${ANSWER} =~ ${PATTERN} ]]; do
+        read -ep "Choose: " ANSWER
+    done
+    echo
+
+    # output the right robot type depending on the user's answer
+    REQ_ROBOT_TYPE=${ROBOT_TYPES[$ANSWER]}
+}
+
+###############################################################################
+# Checks if Displays a menu of all possible robots to the user.
+# The selected robot type will be put in the gobal variable REQ_ROBOT_TYPE.
+# PARAM1: robot type to check (works if empty!)
+# PARAM2: 1 if only the available robots should be displayed, 0 otherwise
+# RETURN: 0 if robot type is not valid, 1 if everything is fine
+#
+function check_robot_type() {
+    REQ_ROBOT_TYPE=$1
+    AVAILABLE=$2
+
+    # check robot type is in the list
+    FOUND=0
+    for I in `seq 0 $((${NUM_ROBOTS}-1))`; do
+        if [[ ${AVAILABLE} == 0 || ${ROBOT_AVAIL[$I]} == 1 ]]; then
+            if [ "${REQ_ROBOT_TYPE}" == "${ROBOT_TYPES[$I]}" ]; then
+                FOUND=1
+            fi
+        fi
+    done
+
+    return ${FOUND}
+}
+
+###############################################################################
+# Displays a list of possible robot types.
+# PARAM1: 1 if only the available robots should be displayed, 0 otherwise
+#
+function display_robot_types() {
+    AVAILABLE=$1
+    
+    echo "Possible robot types are:"
+    for I in `seq 0 $((${NUM_ROBOTS}-1))`; do
+        if [[ ${AVAILABLE} == 0 || ${ROBOT_AVAIL[$I]} == 1 ]]; then
+            echo "  ${ROBOT_TYPES[$I]}"
+        fi
+    done
+}
+
+###############################################################################
+# Displays a simple message at the end of each make run.
+#
+function display_make_message() {
+    echo
+    echo
+    echo "**********************"
+    echo "*        Done        *"
+    echo "**********************"
+    echo
+    echo
+    echo "In the future, to recompile you just need to type"
+    echo
+    echo "  $ make ${GLOBAL_MAKE_ARGS}"
+    echo
+    echo "at the command prompt from directory"
+    pwd
+    echo
+}
+
+###############################################################################
+# Displays a progress counter.
+# Counts the lines going through stdin.
+# Needs the total number of lines as argument.
+# PARAM1: total number of lines
+#
+function progress_bar() {
+    NUM=$1
+
+    # check that we actually have something to count
+    if [ ${NUM} == 0 ]; then
+        while read INPUT; do
+            NOP=
+        done
+        echo -n "0%....25%....50%....75%....100%"
+        return
+    fi
+
+    # init vars  and start counter
+    STEPS_CURR=0
+    STEPS_5PERC=`expr ${NUM} \* 5`
+    echo -n "0%"
+
+    # read every line
+    while read INPUT; do
+        # increase the steps we're at now by 100
+        STEPS_CURR=`expr ${STEPS_CURR} + 100`
+
+        # calculate how many dots we have to go to
+        DOTS_CURR=`expr ${STEPS_CURR} / ${STEPS_5PERC}`
+
+        # output the required number of dots
+        for DOTS in `seq ${DOTS_DONE} ${DOTS_CURR}`; do
+            case ${DOTS} in
+                20) echo -n "100%";;
+                15) echo -n  "75%";;
+                10) echo -n  "50%";;
+                5) echo -n  "25%";;
+                *) if [ ${DOTS} -le 20 ]; then
+                    echo -n "."
+                    fi
+            esac
+        done
+        DOTS_DONE=`expr ${DOTS_CURR} + 1`
+    done
+}
+
+###############################################################################
+# Returns the variable name corresponding to the wanted robot type
+# PARAM1: the requested robot type
+#
+function robot_var() {
+    local REQ_ROBOT_TYPE=$1
+    FOUND=0
+    
+    # check robot type is in the list
+    for I in `seq 0 $((${NUM_ROBOTS}-1))`; do
+        if [ "${REQ_ROBOT_TYPE}" == "${ROBOT_TYPES[$I]}" ]; then
+            REQ_ROBOT_VAR=${ROBOT_VARS[$I]}
+            FOUND=1
+            return 1
+        fi
+    done
+    
+    return 0
+}

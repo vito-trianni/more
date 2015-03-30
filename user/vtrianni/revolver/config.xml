@@ -1,0 +1,27 @@
+<evolution>
+	<type>standard-evolution</type>
+	<max_generation>3</max_generation>
+	<num_samples>1</num_samples>
+	<experiment>xmls/sample_evolution_experiment.xml</experiment>
+	<evolution_basefile>revolver_gen</evolution_basefile>
+	<fitness_basefile>fitness.log</fitness_basefile>
+	<bestind_basefile>bestind_gen</bestind_basefile>
+	<maximisation>true</maximisation>
+
+	<population>
+		<type>mulambda</type>
+		<size>100</size>
+		<lambda>20</lambda>
+		<mutation_probability>0.05</mutation_probability>
+		<crossover_probability>0</crossover_probability>
+		<elite_size>4</elite_size>
+		<genotype>
+			<type>bitstring</type>
+			<bitpervalue>8</bitpervalue>
+			<length>160</length>
+			<max_value>1</max_value>
+			<min_value>0</min_value>
+		</genotype>
+	</population>
+</evolution>
+

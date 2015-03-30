@@ -1,0 +1,179 @@
+<ahss-config>
+	
+	<!-- ****************************** -->
+	<!-- Experiment-specific parameters -->
+	<!-- ****************************** -->
+	<framework>
+		<clocktick>100</clocktick>
+		<maxclock>1000000</maxclock>
+		<controller_path>$AHSSINSTALLDIR/user/vtrianni/simulation_build/controllers/test_ground_controller/.libs</controller_path>
+		<random_seed>328021</random_seed>
+	</framework>
+	
+
+	<!-- ****************************** -->
+	<!-- loop functions                 -->
+	<!-- ****************************** -->	
+        <loop_functions>
+		<library_path>$AHSSINSTALLDIR/user/vtrianni/simulation_build/loop_functions/test_loop_functions/.libs/</library_path>
+	        <library_name>test_loop_functions</library_name>
+        </loop_functions>
+
+
+	<!-- ****************************** -->
+	<!-- Controller-specific parameters -->
+	<!-- ****************************** -->
+	<controllers>
+		
+		<test_ground_controller id="tgc" library="test_ground_controller">
+				
+			<actuators>
+				<footbot_wheels>
+					<implementation>dummy_footbot_wheels</implementation>
+				</footbot_wheels>
+			</actuators>
+				
+			<sensors>
+				<footbot_ground>
+					<implementation>generic_footbot_ground</implementation>
+				</footbot_ground>
+                                <footbot_proximity>
+					<implementation>generic_footbot_polynomial_proximity</implementation>
+                                </footbot_proximity>
+			</sensors>
+		</test_ground_controller>
+	</controllers>
+
+
+	<!-- ******************* -->
+	<!-- Arena configuration -->
+	<!-- ******************* -->
+	<arena size="10, 10, 3" optimization="3D" >
+
+		<!-- A ground -->
+		<wall id="wall_1">
+			<position>0, 2, 1.5</position>
+			<size>4, 3</size>
+			<rotation>0</rotation>
+			<color type="function">
+				<save_to>wall1.ppm</save_to>
+				<directory>$AHSSINSTALLDIR/user/vtrianni/</directory>
+			</color>
+		</wall>
+
+		<wall id="wall_2">
+			<position>-2, 0, 1.5</position>
+			<size>4, 3</size>
+			<rotation>90</rotation>
+			<color type="function">
+				<save_to>wall2.ppm</save_to>
+				<directory>$AHSSINSTALLDIR/user/vtrianni/</directory>
+			</color>
+		</wall>
+
+		<wall id="wall_3">
+			<position>0, -2, 1.5</position>
+			<size>4, 3</size>
+			<rotation>180</rotation>
+			<color type="function">
+				<save_to>wall3.ppm</save_to>
+				<directory>$AHSSINSTALLDIR/user/vtrianni/</directory>
+			</color>
+		</wall>
+
+		<wall id="wall_4">
+			<position>2, 0, 1.5</position>
+			<size>4, 3</size>
+			<rotation>-90</rotation>
+			<color type="function">
+				<save_to>wall4.ppm</save_to>
+				<directory>$AHSSINSTALLDIR/user/vtrianni/</directory>
+			</color>
+		</wall>
+
+
+		<ceiling id="ceil">
+			<position>0, 0, 3</position>
+			<size>4, 4</size>
+			<color type="function">
+				<save_to>ceil.ppm</save_to>
+				<directory>$AHSSINSTALLDIR/user/vtrianni/</directory>
+			</color>
+		</ceiling>
+
+		<ground id="grnd">
+			<position>0, 0, 0</position>
+			<size>4, 4</size>
+			<color type="function">
+				<save_to>grnd.ppm</save_to>
+				<directory>$AHSSINSTALLDIR/user/vtrianni/</directory>
+			</color>
+		</ground>
+
+
+		<!-- A footbot -->
+		<footbot id="fb1">
+			<position>0, 0, 0</position>
+			<orientation>0, 0, 0</orientation>
+			<controller>tgc</controller>
+		</footbot>
+	</arena>
+
+	<!-- **************************************************************** -->
+	<!-- Describe the physics engines that dictate movement and collision -->
+	<!-- **************************************************************** -->
+	<engines>
+		<dummy_engine id="ground">
+			<subclock>1</subclock>
+			<perpendicular_axis>z</perpendicular_axis>
+			<distance>0</distance>
+		</dummy_engine>
+	</engines>
+
+				
+	<!-- ******************************************** -->
+	<!-- Mapping between physics engines and entities -->
+	<!-- ******************************************** -->
+	<arena_physics>
+		<!-- The ground physics engine contains the two footbots -->
+		<engine id="ground">
+			<entity id="fb1" />
+		</engine>
+	</arena_physics>
+
+	<!-- ********************************* -->
+	<!-- Visualisation-specific parameters -->
+	<!-- ********************************* -->
+	<visualisations>
+		<ogre_render id="mainwindow">
+			<modelization>fast</modelization>
+			<user_directory>vtrianni</user_directory>
+			<with_gui>true</with_gui>
+			<reset_configuration>false</reset_configuration>
+			<start_paused>true</start_paused>
+			<grab_input>false</grab_input>
+			<link_all_cameras>false</link_all_cameras>
+			<movie_mode>false</movie_mode>
+			<camera id="1">
+			<position>8.975, 3.525, .25</position>
+			<look_at>5, 5, 0</look_at>true
+			<field_of_view>65</field_of_view>
+			</camera>
+			
+			<camera id="2"> 
+			<position>5, 5, 10</position>
+			<look_at>5, 5, 0</look_at>
+			<field_of_view>45</field_of_view>
+			</camera>
+			
+			<window_title>Ground Sensor TestCase</window_title>
+			<write_frames>false</write_frames>
+			<frame_directory>console</frame_directory>
+			<frame_filename>test_frame_</frame_filename>
+			<frame_format>jpg</frame_format>
+			<debug>false</debug>
+			<move_style>opengl</move_style>  
+		</ogre_render >
+	</visualisations>
+				
+</ahss-config>

@@ -1,0 +1,117 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="0" />
+    <experiment length="120" ticks_per_second="10" random_seed="3"/>
+  </framework>
+
+  <!-- ****************** -->
+  <!-- * Loop functions * -->
+  <!-- ****************** -->
+  <loop_functions 
+     library="$ARGOSINSTALLDIR/build/user/vtrianni/simulator/experiments/flocking/libflocking.so" 
+     label="flocking_lf" 
+     num_robots = "10"
+     min_init_distance = "0.25"
+     init_radius = "1"
+     max_robot_speed = "10"
+     cohesion_range="0:2"
+     gamma_weight="0.5">
+
+  </loop_functions>
+
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+    
+    <flocking_controller id="nn" library="$ARGOSINSTALLDIR/build/user/vtrianni/simulator/experiments/flocking/libflocking.so">
+      <actuators>
+        <footbot_wheels implementation="default" noise_std_dev="0.05" />
+        <footbot_leds implementation="default" />
+      </actuators>
+
+      <sensors>
+        <footbot_proximity implementation="rot_z_only"  noise_level="0.05" show_rays="true" />
+        <footbot_omnidirectional_camera implementation="rot_z_only" 
+                                      blob_noise_std_dev="0.05"
+                                      check_occlusions="true"
+                                      show_rays="false" />
+      </sensors>
+
+      <parameters parameter_file="/home/vtrianni/Work/argos/user/vtrianni/experiments/flocking/MOER/MO/seed-14/posteval_gen0199_nd0012.log"
+                num_inputs="18"
+                num_outputs="2"
+                inputs_for_vector="6"
+                speed_range="-10:10"
+                camera_range="0:100"
+                led_configuration="00RR0000BB00"/>
+
+    </flocking_controller>
+  </controllers>
+
+
+
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <!-- Note: rotations are specified and performed in ZYX order (opposite of ARGoS1) -->
+  <arena size="5, 5, 3">
+    <floor id="floor" source="loop_functions" pixels_per_meter="100" />
+  </arena>
+
+
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <kinematics2d id="ground" iterations="10" />
+  </physics_engines>
+
+  <!-- ************************************ -->
+  <!-- * Arena -> Physics Engines mapping * -->
+  <!-- ************************************ -->
+  <arena_physics>
+    <engine id="ground" >
+    </engine>
+  </arena_physics>
+
+
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <visualization>
+    <povray_render id="povray" output_folder="/home/vtrianni/Work/argos/user/vtrianni/experiments/flocking/povray">
+      <environment type="standard"> 
+        <floor type="plain">
+          <color povray="Grey"/>
+        </floor>
+        <sky type="plain">
+          <color povray="White"/>
+        </sky>
+        <box id="W*" type="texture">
+             <standard pattern="chrome.pov"/>
+        </box>
+        <cylinder id="C*" type="texture">
+             <standard pattern="chrome.pov"/>
+        </cylinder>
+      </environment>
+      <scene step="0">
+       <camera type="normal" position="1,1,2" look_at="0,0,0"/>
+      </scene>
+      <scene step="450">
+       <camera type="normal" position="0,0,4" look_at="0,0,0"/>
+      </scene>
+      <scene step="900">
+       <camera type="normal" position="4,0,1" look_at="0,0,0"/>
+      </scene>
+    </povray_render>
+  </visualization>
+
+</argos-configuration>

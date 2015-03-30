@@ -1,0 +1,5 @@
+#add_definitions(-Wall -Werror -DCMAKE_BUILD_TYPE=Debug -DARGOS_DBG_CONTROLLER)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_C_COMPILER "gcc44")
+set(CMAKE_CXX_COMPILER "g++44")
+
